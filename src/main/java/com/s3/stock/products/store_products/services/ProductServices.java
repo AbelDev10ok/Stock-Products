@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.s3.stock.products.store_products.entitis.Category;
 import com.s3.stock.products.store_products.entitis.Product;
@@ -22,15 +23,17 @@ public class ProductServices implements IProductServices{
     @Autowired
     private ICategoryRepository categoryRepository;
 
+
+    @Transactional
     @Override
     public Product save(ProductRequest productDto) {
-    // Check if a product with the same name already exists
-    Product existingProduct = productRepository.findByName(productDto.getName()).orElse(null);
-
-    // Convert category string to Category object
-    // Podira hacer que si la categoria no existe, se cree una nueva, pero no se si es necesario ya que la creo desde la base de datos.
     Category category = categoryRepository.findByName(productDto.getCategory())
             .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+    
+
+    Product existingProduct = productRepository.findByName(productDto.getName()).orElse(null);
+
+    // Podira hacer que si la categoria no existe, se cree una nueva, pero no se si es necesario ya que la creo desde la base de datos.
 
     Product product = new Product();
     product.setName(productDto.getName());
@@ -39,20 +42,21 @@ public class ProductServices implements IProductServices{
     product.setStock(productDto.getStock());
     product.setCategory(category);
 
-    if (existingProduct != null) {
-        // Update existing product
-        existingProduct.setDescription(product.getDescription());
-        existingProduct.setPrice(product.getPrice());
-        existingProduct.setStock(product.getStock());
-        existingProduct.setCategory(category);
-        // Update other fields as needed
-        return productRepository.save(existingProduct);
-    } else {
-        // Save new product
-        return productRepository.save(product);
-    }
+        if (existingProduct != null) {
+            // Update existing product
+            existingProduct.setDescription(product.getDescription());
+            existingProduct.setPrice(product.getPrice());
+            existingProduct.setStock(product.getStock());
+            existingProduct.setCategory(category);
+            // Update other fields as needed
+            return productRepository.save(existingProduct);
+        } else {
+            // Save new product
+            return productRepository.save(product);
+        }
     }
     
+    @Transactional
     @Override
     public void delete(Long id) {
         Optional<Product> product = productRepository.findById(id);
@@ -67,29 +71,36 @@ public class ProductServices implements IProductServices{
         
     }
     
+    @Transactional(readOnly = true)
     @Override
-    public Product findById(Long id) {
+    public ProductRequest findById(Long id) {
         Optional<Product> product = productRepository.findById(id);
         if (!product.isPresent()) {
             throw new EntityNotFoundException("No se pudo encontrar el producto");
         }
-        return product.get();
+        return convertToDto(product.get());
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Product findByName(String name) {
+    public ProductRequest findByName(String name) {
         Optional<Product> product = productRepository.findByName(name);
         if (!product.isPresent()) {
             throw new EntityNotFoundException("No se pudo encontrar el producto");
         }
-        return product.get();
+        return convertToDto(product.get());
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public List<ProductRequest> findAll() {
+        return productRepository.findAll()
+            .stream()
+            .map(this::convertToDto)
+            .toList();
     }
 
+    @Transactional
     @Override
     public void increaseStock(Long productId, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
@@ -97,20 +108,38 @@ public class ProductServices implements IProductServices{
         productRepository.save(product);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<Product> findByCategoryName(String name) {
-        return productRepository.findByCategoryName(name);
+    public List<ProductRequest> findByCategory(String name) {
+        return productRepository.findByCategory_Name(name).stream().map( product -> {
+            return convertToDto(product);
+        }).toList();
     }
 
 
+    @Transactional(readOnly = true)
     @Override
-    public List<Product> findByNameContaining(String name) {
-        return productRepository.findByNameContaining(name);
+    public List<ProductRequest> findByNameContaining(String name) {
+        return productRepository.findByNameContaining(name).stream().map(product -> {
+            return convertToDto(product);
+        }).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<Product> findByStockGreaterThanEqual(int stock) {
-        return productRepository.findByStockGreaterThanEqual(stock);
+    public List<ProductRequest> findByStockGreaterThanEqual(int stock) {
+        return productRepository.findByStockGreaterThanEqual(stock).stream().map(product ->convertToDto(product)).toList();
+    }
+
+    private ProductRequest convertToDto(Product product) {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName(product.getName());
+        productRequest.setDescription(product.getDescription());
+        productRequest.setPrice(product.getPrice());
+        productRequest.setCategory(product.getCategory().getName());
+        productRequest.setStock(product.getStock());
+        productRequest.setId(product.getId());
+        return productRequest;
     }
 
 }

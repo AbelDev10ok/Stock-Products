@@ -6,14 +6,14 @@ import com.s3.stock.products.store_products.entitis.Product;
 import com.s3.stock.products.store_products.entitis.dto.ProductRequest;
 
 public interface IProductServices {
-    public List<Product> findAll();
-    public Product findById(Long id);
+    public List<ProductRequest> findAll();
+    public ProductRequest findById(Long id);
     public Product save(ProductRequest product);
-    public Product findByName(String name);
+    public ProductRequest findByName(String name);
     public void delete(Long id);
-    public List<Product> findByCategoryName(String name);
-    public List<Product> findByNameContaining(String name);
-    public List<Product> findByStockGreaterThanEqual(int stock);
+    public List<ProductRequest> findByCategory(String name);
+    public List<ProductRequest> findByNameContaining(String name);
+    public List<ProductRequest> findByStockGreaterThanEqual(int stock);
     public void increaseStock(Long productId, int quantity);
     // public List<Product> findByPriceLessThanEqual(double price);
     // public List<Product> findByPriceGreaterThanEqual(double price);

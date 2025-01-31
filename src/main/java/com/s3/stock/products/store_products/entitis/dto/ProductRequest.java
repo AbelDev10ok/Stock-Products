@@ -1,6 +1,7 @@
 package com.s3.stock.products.store_products.entitis.dto;
 
 public class ProductRequest {
+    private Long id;
     private String name;
     private String description;
     private Double price;
@@ -9,6 +10,14 @@ public class ProductRequest {
 
     public ProductRequest() {
     }
+
+    public ProductRequest(String name, String description, Double price, String category, int stock) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.category = category;
+        this.stock = stock;
+    }   
 
     public String getName() {
         return name;
@@ -49,5 +58,15 @@ public class ProductRequest {
     public void setStock(int stock) {
         this.stock = stock;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    
     
 }
