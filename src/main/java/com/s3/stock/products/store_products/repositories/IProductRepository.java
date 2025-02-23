@@ -18,6 +18,7 @@ public interface IProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContaining(@Param("name") String name);
     Optional<Product> findByName(String name);
     List<Product> findByStockGreaterThanEqual(int stock);
+    Optional<Product> findBySku(String sku);
     // List<Product> findByPriceLessThanEqual(double price);
     // List<Product> findByPriceGreaterThanEqual(double price);
     // List<Product> findByPriceBetween(double price1, double price2);

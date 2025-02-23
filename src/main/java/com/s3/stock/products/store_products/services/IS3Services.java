@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface IS3Services {
     // crear bucket en s3
     String createBucket(String bucketName);
@@ -16,7 +18,10 @@ public interface IS3Services {
     List<String> getAllBuckets();
 
     // Cargar un archivo a un bucket
-    Boolean uploadFile(String nucketName, String key, Path fileLocation);
+    // Boolean uploadFile(String nucketName, String key, Path fileLocation);
+
+    String uploadFile(MultipartFile file) throws IOException;
+
     
     // Descargar un archivo de un bucket
     void downloadFile(String bucket, String key) throws IOException;

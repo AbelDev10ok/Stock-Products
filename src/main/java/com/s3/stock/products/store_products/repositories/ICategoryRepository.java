@@ -10,5 +10,6 @@ import com.s3.stock.products.store_products.entitis.Category;
 @Repository
 public interface ICategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByName(String name);
+    Optional<Category> findById( Long id);
 
 }

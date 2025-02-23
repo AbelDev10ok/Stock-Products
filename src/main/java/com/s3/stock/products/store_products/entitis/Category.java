@@ -8,6 +8,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -19,9 +22,16 @@ public class Category {
     @Column(unique = true)
     private String name;
 
-    // a una categoria le pertenecen muchos productos
-    // mappedBy: nombre del atributo en la clase Product que hace referencia a la categoria,
-    // no creara campo nuevo en categoria.
+    @ManyToOne
+    @JoinColumn(name = "category_parent_id")
+    private Category categoryParent;
+
+    @OneToMany(mappedBy = "categoryParent")
+    private List<Category> subCategories = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "categorys")
+    private List<Atribut> atributs = new ArrayList<>();
+
     @OneToMany(mappedBy = "category")
     private List<Product> products = new ArrayList<>();
 
@@ -32,6 +42,7 @@ public class Category {
         this.name = name;
     }
 
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -48,49 +59,36 @@ public class Category {
         this.name = name;
     }
 
+    public Category getCategoryParent() {
+        return categoryParent;
+    }
+
+    public void setCategoryParent(Category categoryParent) {
+        this.categoryParent = categoryParent;
+    }
+
+    public List<Category> getSubCategories() {
+        return subCategories;
+    }
+
+    public void setSubCategories(List<Category> subCategories) {
+        this.subCategories = subCategories;
+    }
+
+    public List<Atribut> getAtributs() {
+        return atributs;
+    }
+
+    public void setAtributs(List<Atribut> atributs) {
+        this.atributs = atributs;
+    }
+
     public List<Product> getProducts() {
         return products;
     }
 
     public void setProducts(List<Product> products) {
         this.products = products;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((products == null) ? 0 : products.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Category other = (Category) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (products == null) {
-            if (other.products != null)
-                return false;
-        } else if (!products.equals(other.products))
-            return false;
-        return true;
     }
 
     

@@ -1,19 +1,23 @@
 package com.s3.stock.products.store_products.services;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.s3.stock.products.store_products.entitis.Product;
-import com.s3.stock.products.store_products.entitis.dto.ProductRequest;
+import com.s3.stock.products.store_products.entitis.dto.ProductDto;
 
 public interface IProductServices {
-    public List<ProductRequest> findAll();
-    public ProductRequest findById(Long id);
-    public Product save(ProductRequest product);
-    public ProductRequest findByName(String name);
+    public List<ProductDto> findAll();
+    public ProductDto findById(Long id);
+    public Product getProductfindById(Long id);
+    public void save(ProductDto productdo) throws IOException, IllegalAccessException, Exception;
+    public void saveProduct(Product product);
+    public void update(ProductDto productDto);
+    public ProductDto findByName(String name);
     public void delete(Long id);
-    public List<ProductRequest> findByCategory(String name);
-    public List<ProductRequest> findByNameContaining(String name);
-    public List<ProductRequest> findByStockGreaterThanEqual(int stock);
+    public List<ProductDto> findByCategory(String name);
+    public List<ProductDto> findByNameContaining(String name);
+    public List<ProductDto> findByStockGreaterThanEqual(int stock);
     public void increaseStock(Long productId, int quantity);
     // public List<Product> findByPriceLessThanEqual(double price);
     // public List<Product> findByPriceGreaterThanEqual(double price);

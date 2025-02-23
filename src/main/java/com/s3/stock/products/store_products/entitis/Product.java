@@ -1,6 +1,9 @@
 package com.s3.stock.products.store_products.entitis;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 
 @Entity
@@ -21,9 +25,9 @@ public class Product {
     @Column(nullable = false)
     private String description;
 
-    // @NotBlank
-    // @Column(nullable = false)
-    // @Min(value = 1)
+    private String imagUrl;
+
+
     private Double price;
 
     // a un producto le pertenece una categoria, y a muchas categorias le pertenece un producto
@@ -33,17 +37,35 @@ public class Product {
 
     @Column(nullable = false)
     private int stock;
-    
+
+    private String brand;
+
+    private String model;
+
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+    private List<ProductAttribute> productAttributes = new ArrayList<>();
+
+    // un producto puede tener muchas imagenes
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
+    @Column(nullable = false, unique = true)
+    private String sku;    
+
     public Product() {
     }
 
-    public Product(String name, String description, Double price, Category category, int stock) {
+    public Product(String name, String description, Double price, Category category, int stock, String brand, String model, String imagURL) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.category = category;
         this.stock = stock;
-    }   
+        this.brand = brand;
+        this.model = model;
+        this.imagUrl = imagURL;
+        this.sku = generateSku();
+    }
 
     public Long getId() {
         return id;
@@ -93,6 +115,70 @@ public class Product {
         this.stock = stock;
     }
 
+    private String generateSku() {
+        return name.replaceAll("\\s+", "-").toUpperCase() + "-" + category.getName().replaceAll("\\s+", "-").toUpperCase();
+    }
+
+    public List<ProductAttribute> getProductAttributes() {
+        return productAttributes;
+    }
+
+    public void setProductAttributes(List<ProductAttribute> productAttributes) {
+        this.productAttributes = productAttributes;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+        
+    public String getImagUrl() {
+        return imagUrl;
+    }
+
+    public void setImagUrl(String imagUrl) {
+        this.imagUrl = imagUrl;
+    }
+
+    public List<ProductImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
+    }
+
+    // Métodos para agregar y eliminar imágenes
+    public void addImage(ProductImage image) {
+        images.add(image);
+        image.setProduct(this);
+    }
+
+    public void removeImage(ProductImage image) {
+        images.remove(image);
+        image.setProduct(null);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -103,6 +189,10 @@ public class Product {
         result = prime * result + ((price == null) ? 0 : price.hashCode());
         result = prime * result + ((category == null) ? 0 : category.hashCode());
         result = prime * result + stock;
+        result = prime * result + ((brand == null) ? 0 : brand.hashCode());
+        result = prime * result + ((model == null) ? 0 : model.hashCode());
+        result = prime * result + ((productAttributes == null) ? 0 : productAttributes.hashCode());
+        result = prime * result + ((sku == null) ? 0 : sku.hashCode());
         return result;
     }
 
@@ -142,9 +232,26 @@ public class Product {
             return false;
         if (stock != other.stock)
             return false;
+        if (brand == null) {
+            if (other.brand != null)
+                return false;
+        } else if (!brand.equals(other.brand))
+            return false;
+        if (model == null) {
+            if (other.model != null)
+                return false;
+        } else if (!model.equals(other.model))
+            return false;
+        if (productAttributes == null) {
+            if (other.productAttributes != null)
+                return false;
+        } else if (!productAttributes.equals(other.productAttributes))
+            return false;
+        if (sku == null) {
+            if (other.sku != null)
+                return false;
+        } else if (!sku.equals(other.sku))
+            return false;
         return true;
     }
-
-    
-
 }

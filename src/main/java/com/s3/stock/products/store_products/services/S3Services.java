@@ -8,20 +8,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -30,10 +31,13 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 @Service
 public class S3Services implements IS3Services{
+
     @Autowired
     private S3Client s3Client;
+
     @Value("${spring.destination.folder}")
     private String destinatioFolder;
+    
     @Autowired
     private S3Presigner s3Presigner;
 
@@ -45,12 +49,13 @@ public class S3Services implements IS3Services{
 
     @Override
     public String checkIfBucketExist(String bucketName) {
-        try {
-            this.s3Client.headBucket(headBucket -> headBucket.bucket(bucketName));
-            return "El bucket existe";
-        } catch (S3Exception e) {
-            return "El bucket no existe";
-        }
+        ListBucketsResponse listBucketsResponse = this.s3Client.listBuckets();
+        System.out.println("sdasdasdasdsa"+bucketName);
+        boolean bucketExists = listBucketsResponse.buckets()
+            .stream()
+            .anyMatch(bucket -> bucket.name().equals(bucketName));
+    
+        return bucketExists ? "El bucket existe" : "El bucket no existe";
 
     }
 
@@ -69,15 +74,34 @@ public class S3Services implements IS3Services{
 
 
 
+    // @Override
+    // public Boolean uploadFile(String bnucketName, String key, Path fileLocation) {
+
+    //     PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+    //         .bucket(bnucketName)
+    //         .key(key)
+    //         .build();
+    //     PutObjectResponse putObjectResponse = this.s3Client.putObject(putObjectRequest, fileLocation);
+    //     return putObjectResponse.sdkHttpResponse().isSuccessful();
+    // }
+    
     @Override
-    public Boolean uploadFile(String nucketName, String key, Path fileLocation) {
+        public String uploadFile(MultipartFile file) throws IOException {
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-            .bucket(nucketName)
-            .key(key)
-            .build();
-        PutObjectResponse putObjectResponse = this.s3Client.putObject(putObjectRequest, fileLocation);
-        return putObjectResponse.sdkHttpResponse().isSuccessful();
+                .bucket("control-stock-electro123")
+                .key(fileName)
+                // en este caso le coloco este contenttype para que la ruta que me de no la descargue sino que me muestre la imagen
+                .contentType("image/jpeg")
+                .build();
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        String s =s3Client.utilities().getUrl(builder -> builder.bucket("control-stock-electro123").key(fileName)).toString();
+        System.out.println(s);
+        return s;
     }
+
+    
 
     @Override
     public void downloadFile(String bucket, String key) throws IOException {
