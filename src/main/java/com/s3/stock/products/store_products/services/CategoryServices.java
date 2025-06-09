@@ -7,14 +7,16 @@ import java.util.stream.Collectors;
 import org.hibernate.action.internal.EntityAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.s3.stock.products.store_products.entitis.Category;
 import com.s3.stock.products.store_products.entitis.Product;
 import com.s3.stock.products.store_products.entitis.dto.CategoryRequest;
 import com.s3.stock.products.store_products.entitis.dto.CategoryResponse;
 import com.s3.stock.products.store_products.entitis.dto.ProductAttributeDto;
-import com.s3.stock.products.store_products.entitis.dto.ProductDto;
+import com.s3.stock.products.store_products.entitis.dto.ProductResponseDto;
 import com.s3.stock.products.store_products.repositories.ICategoryRepository;
+import com.s3.stock.products.store_products.services.interfaces.ICategoryServices;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -25,6 +27,22 @@ public class CategoryServices implements ICategoryServices {
     private ICategoryRepository categoryRepository;
 
 
+        
+    @Transactional
+    @Override
+    public CategoryResponse save(CategoryRequest categoryDto) {
+        Optional<Category> category = categoryRepository.findByName(categoryDto.getName());
+
+        if(category.isPresent()){
+            throw new EntityNotFoundException("Category already exist");
+        }
+        Category newCategory = new Category();
+        newCategory.setName(categoryDto.getName());
+        categoryRepository.save(newCategory);
+        return convertToCategoryDto(newCategory); 
+    }
+
+    @Transactional
     @Override
     public void delete(CategoryRequest categoryDto) {
         Optional<Category> category = categoryRepository.findByName(categoryDto.getName());
@@ -34,45 +52,40 @@ public class CategoryServices implements ICategoryServices {
             throw new EntityNotFoundException("Category not exist");
         }
     }
-
+    
+    @Transactional
     @Override
     public void deleteAll() {
         categoryRepository.deleteAll();
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
         categoryRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Category not exist"));
         categoryRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<CategoryResponse> findAll() {
         return categoryRepository.findAll().stream().map(category->convertToCategoryDto(category)).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public CategoryResponse findById(Long id) {
-        categoryRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Category not exist"));
+        Category category = categoryRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Category not exist"));
 
-        return convertToCategoryDto(categoryRepository.findById(id).orElse(null));
+        return convertToCategoryDto(category);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public CategoryResponse findByName(String name) {
-        categoryRepository.findByName(name).orElseThrow(()-> new EntityNotFoundException("Category not exist"));
+        Category category = categoryRepository.findByName(name).orElseThrow(()-> new EntityNotFoundException("Category not exist"));
 
-        return convertToCategoryDto(categoryRepository.findByName(name).orElse(null));
-    }
-
-    @Override
-    public CategoryResponse save(CategoryRequest categoryDto) {
-        categoryRepository.findByName(categoryDto.getName()).orElseThrow(()-> new EntityNotFoundException("Category not exist"));
-
-        Category category = new Category();
-        category.setName(categoryDto.getName());
-        categoryRepository.save(category);
-        return convertToCategoryDto(category); 
+        return convertToCategoryDto(category);
     }
 
     private CategoryResponse convertToCategoryDto(Category category) {
@@ -91,8 +104,8 @@ public class CategoryServices implements ICategoryServices {
         return categoryDto;
     }
 
-    private ProductDto converToProductDto(Product product) {
-        ProductDto productDto = new ProductDto();
+    private ProductResponseDto converToProductDto(Product product) {
+        ProductResponseDto productDto = new ProductResponseDto();
         productDto.setId(product.getId());
         productDto.setName(product.getName());
         productDto.setPrice(product.getPrice());

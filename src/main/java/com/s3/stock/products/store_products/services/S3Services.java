@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.s3.stock.products.store_products.services.interfaces.IS3Services;
+
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -23,6 +25,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -84,6 +87,20 @@ public class S3Services implements IS3Services{
     //     PutObjectResponse putObjectResponse = this.s3Client.putObject(putObjectRequest, fileLocation);
     //     return putObjectResponse.sdkHttpResponse().isSuccessful();
     // }
+
+    @Override
+    public void deleteFile(String fileUrl) throws IOException {
+        try {
+            // Extraer el nombre del archivo (key) desde la URL
+            String bucketName = "control-stock-electro123"; // Nombre de tu bucket
+            String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+            // Eliminar el archivo de S3
+            s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key));
+        } catch (S3Exception e) {
+            throw new IOException("Error al eliminar el archivo de S3: " + e.getMessage(), e);
+        }
+    }
     
     @Override
         public String uploadFile(MultipartFile file) throws IOException {

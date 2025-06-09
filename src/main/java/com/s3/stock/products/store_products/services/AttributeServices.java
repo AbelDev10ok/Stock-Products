@@ -9,8 +9,10 @@ import com.s3.stock.products.store_products.entitis.Atribut;
 import com.s3.stock.products.store_products.entitis.dto.AttributeRequest;
 import com.s3.stock.products.store_products.repositories.IAttributRepository;
 import com.s3.stock.products.store_products.repositories.ICategoryRepository;
+import com.s3.stock.products.store_products.services.interfaces.IAttributeServices;
 
 
+// este servicio solo esta de forma basica, se debe implementar la logica de negocio con las relaciones de dicha entidad.
 @Service
 public class AttributeServices implements IAttributeServices {
 
@@ -30,7 +32,8 @@ public class AttributeServices implements IAttributeServices {
 
     @Override
     public void delete(AttributeRequest attributeDto) {
-        // TODO Auto-generated method stub
+        Atribut atribut = attributRepository.findByName(attributeDto.getName()).get();
+        attributRepository.delete(atribut);
     }
 
     @Override

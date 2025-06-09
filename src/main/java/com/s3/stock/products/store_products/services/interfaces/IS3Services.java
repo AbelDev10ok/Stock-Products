@@ -1,7 +1,6 @@
-package com.s3.stock.products.store_products.services;
+package com.s3.stock.products.store_products.services.interfaces;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 
@@ -32,5 +31,8 @@ public interface IS3Services {
 
     // Generar URL prefirmada para descargar archivis
     String generatePresignedDownloadUrl(String bucketName, String key, Duration duration);
+
+
+    void deleteFile(String fileUrl) throws IOException ;
 
 }

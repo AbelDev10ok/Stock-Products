@@ -6,13 +6,14 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 // import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public class ProductDto {
+public class ProductResponseDto {
     private Long id;
     @NotBlank(message = "Name is required")
     private String name;
@@ -25,19 +26,27 @@ public class ProductDto {
     private String category;
     @NotNull(message = "Stock is required")
     @Min(value = 1, message = "Stock must be greater than 0")
-    private int stock;
+    private Integer stock;
 
     @NotBlank(message = "Brand is required")
     private String brand;
-
+    
     @NotBlank(message = "Model is required")
     private String model;
 
-    private MultipartFile image; // Campo opcional para la imagen
+    @NotBlank(message = "Provider is required")
+    private String provider;
+
+
+    private List<ProductAttributeDto> productAttributes = new ArrayList<>();
+
+    private List<String> imageUrls; // Nuevo campo para las URLs de las imágenes
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Solo para escritura (deserialización)
+    private MultipartFile image;
 
     
     
-    private List<ProductAttributeDto> productAttributes = new ArrayList<>();
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
     // @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -51,11 +60,22 @@ public class ProductDto {
     private String sku;
 
 
-    public ProductDto() {
+    public ProductResponseDto() {
     }
 
-    public ProductDto(Long id, String name, String description, Double price, String category, int stock, String brand, String model, List<ProductAttributeDto> productAttributes, String sku,  MultipartFile image) {
-        this.id = id;
+
+    
+
+
+    public ProductResponseDto(@NotBlank(message = "Name is required") String name,
+            @NotBlank(message = "Description is required") String description,
+            @NotNull(message = "Price is required") @Min(value = 1, message = "Price must be greater than 0") Double price,
+            @NotNull(message = "Category is required") String category,
+            @NotNull(message = "Stock is required") @Min(value = 1, message = "Stock must be greater than 0") int stock,
+            @NotBlank(message = "Brand is required") String brand,
+            @NotBlank(message = "Model is required") String model,
+            @NotBlank(message = "Provider is required") String provider, List<ProductAttributeDto> productAttributes,
+            List<String> imageUrls, MultipartFile image, String sku) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -63,10 +83,16 @@ public class ProductDto {
         this.stock = stock;
         this.brand = brand;
         this.model = model;
+        this.provider = provider;
         this.productAttributes = productAttributes;
-        this.sku = sku;
+        this.imageUrls = imageUrls;
         this.image = image;
+        this.sku = sku;
     }
+
+
+
+
 
     public String getName() {
         return name;
@@ -100,11 +126,11 @@ public class ProductDto {
         this.category = category;
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 
-    public void setStock(int stock) {
+    public void setStock(Integer stock) {
         this.stock = stock;
     }
 
@@ -149,17 +175,33 @@ public class ProductDto {
         this.model = model;
     }
 
-    public MultipartFile getImage() {
-        return image;
+	public List<String> getImageUrls() {
+		return imageUrls;
+	}
+
+	public void setImageUrls(List<String> imageUrls) {
+		this.imageUrls = imageUrls;
+	}
+
+	public MultipartFile getImage() {
+		return image;
+	}
+
+	public void setImage(MultipartFile imageUrl) {
+		this.image = imageUrl;
+	}
+
+
+
+    public String getProvider() {
+        return provider;
     }
 
-    public void setImage(MultipartFile image) {
-        this.image = image;
+
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
-    
-
-    
-    
-    
+        
 }

@@ -1,4 +1,4 @@
-package com.s3.stock.products.store_products.services;
+package com.s3.stock.products.store_products.services.interfaces;
 
 import java.util.List;
 

@@ -2,7 +2,10 @@ package com.s3.stock.products.store_products.entitis;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
@@ -27,7 +32,7 @@ public class Product {
 
     private String imagUrl;
 
-
+    @Column(nullable = false)
     private Double price;
 
     // a un producto le pertenece una categoria, y a muchas categorias le pertenece un producto
@@ -37,9 +42,11 @@ public class Product {
 
     @Column(nullable = false)
     private int stock;
-
+    
+    @Column(nullable = false)
     private String brand;
 
+    @Column(nullable = false)
     private String model;
 
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
@@ -50,7 +57,18 @@ public class Product {
     private List<ProductImage> images = new ArrayList<>();
 
     @Column(nullable = false, unique = true)
-    private String sku;    
+    private String sku;
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InventoryMovement> movements;
+
+    @ManyToMany
+    @JoinTable(
+        name = "product_provider",  // Nombre de la tabla intermedia
+        joinColumns = @JoinColumn(name = "product_id"),  // Columna para el ID del producto
+        inverseJoinColumns = @JoinColumn(name = "provider_id")  // Columna para el ID del proveedor
+    )
+    private Set<Provider> providers = new HashSet<>();
 
     public Product() {
     }
@@ -179,6 +197,22 @@ public class Product {
         image.setProduct(null);
     }
 
+    public List<InventoryMovement> getMovements() {
+        return movements;
+    }
+
+    public void setMovements(List<InventoryMovement> movements) {
+        this.movements = movements;
+    }
+
+    public Set<Provider> getProviders() {
+        return providers;
+    }
+
+    public void setProviders(Set<Provider> productos) {
+        this.providers = productos;
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -254,4 +288,5 @@ public class Product {
             return false;
         return true;
     }
+    
 }

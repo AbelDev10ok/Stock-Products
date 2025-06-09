@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.s3.stock.products.store_products.entitis.dto.CategoryRequest;
-import com.s3.stock.products.store_products.services.ICategoryServices;
+import com.s3.stock.products.store_products.services.interfaces.ICategoryServices;
 import com.s3.stock.products.store_products.util.ValidationDto;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -36,19 +35,13 @@ public class CategoryController {
 
     @GetMapping("/find/by-name")
     public ResponseEntity<?> getCategoryByName(@RequestParam String name) { 
-        try {
-            return ResponseEntity.ok(categoryServices.findByName(name));
-        } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(e.getMessage());
-        }    }
+        return ResponseEntity.ok(categoryServices.findByName(name));
+
+    }
 
     @GetMapping("/find/by-id/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(categoryServices.findById(id));
-        } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(e.getMessage());
-        }
+        return ResponseEntity.ok(categoryServices.findById(id));
     }
 
     @DeleteMapping("/delete")
@@ -56,13 +49,8 @@ public class CategoryController {
         if(result.hasErrors()) {
             return validationDto.validation(result);
         }
-        try {
             categoryServices.delete(categoryDto);
             return ResponseEntity.ok("Category deleted successfully");
-            
-        } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(e.getMessage());
-        }
     }
 
     @PostMapping("/save")
@@ -70,10 +58,6 @@ public class CategoryController {
         if(result.hasErrors()){
             return validationDto.validation(result);
         }
-        try {
             return ResponseEntity.ok(categoryServices.save(categoryDto));
-        } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(e.getMessage());
-        }
     }
 }

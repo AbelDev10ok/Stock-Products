@@ -5,7 +5,7 @@ import java.util.List;
 public class CategoryResponse {
     private Long id;
     private String name;
-    private List<ProductDto> products;
+    private List<ProductResponseDto> products;
     List<CategoryRequest> subCategories;
 
     public CategoryResponse() {
@@ -32,11 +32,11 @@ public class CategoryResponse {
         this.name = name;
     }
 
-    public List<ProductDto> getProducts() {
+    public List<ProductResponseDto> getProducts() {
         return products;
     }
 
-    public void setProducts(List<ProductDto> products) {
+    public void setProducts(List<ProductResponseDto> products) {
         this.products = products;
     }
 

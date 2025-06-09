@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.s3.stock.products.store_products.entitis.dto.AttributeRequest;
-import com.s3.stock.products.store_products.services.IAttributeServices;
+import com.s3.stock.products.store_products.services.interfaces.IAttributeServices;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

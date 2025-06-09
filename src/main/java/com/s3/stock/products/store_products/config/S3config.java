@@ -2,6 +2,7 @@ package com.s3.stock.products.store_products.config;
 
 import java.net.URI;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,13 @@ public class S3config {
     private String awsSecretKey;
     @Value("${aws.region}")
     private String region;
+
+    
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+
 
     // cliente s3 Syncrono
     @Bean    
