@@ -55,7 +55,8 @@ public class SecurityConfig {
     DefaultSecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         return http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.POST ,"/api/v1/auth/**").permitAll()
-                .anyRequest().hasRole("ADMIN"))
+                .anyRequest().authenticated()
+                )
                 .addFilter(new JwtAuthentication(authenticationManager()))
                 .addFilter(new JwtValidation(authenticationManager(),userRepository))
                 .csrf(config -> config.disable())

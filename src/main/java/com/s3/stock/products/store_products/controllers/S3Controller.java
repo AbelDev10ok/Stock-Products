@@ -81,6 +81,7 @@ public class S3Controller {
     public String uploadImage(@PathVariable Long productId, @RequestParam("file") MultipartFile file) throws IOException {
         Product product = productServices.getProductfindById(productId);
         String imageUrl = s3Services.uploadFile(file);
+        
 
         ProductImage productImage = new ProductImage();
         productImage.setImageUrl(imageUrl);

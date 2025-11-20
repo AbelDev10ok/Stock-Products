@@ -41,58 +41,9 @@ public class ProductController {
     @Autowired
     private	ValidationDto validationDto;
 
-    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
-    // @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> listProducts() {
         return ResponseEntity.ok(productServices.findAll());
-    }
-
-    @GetMapping("/find/name")
-    public ResponseEntity<?> getProductByName(@RequestParam String name) {
-            return ResponseEntity.ok(productServices.findByName(name));
-    }
-
-    @GetMapping("/find/id/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(productServices.findById(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/find/category")
-    public ResponseEntity<?> getProductsByCategory(@RequestParam String categoryName) {
-        try {
-            return ResponseEntity.ok(productServices.findByCategory(categoryName));
-            
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/find")
-    public ResponseEntity<?> getProductByNameAndStock(
-        @RequestParam(required = false) String name, 
-        @RequestParam(required = false) Integer stock) {
-        return ResponseEntity.ok(productServices.findByNameContainingAndStock(name, stock));
-    }
-
-    // @GetMapping("/find/stock/{stock}")
-    // public ResponseEntity<?> getProductsByStock(@PathVariable int stock) {
-    //     return ResponseEntity.ok(productServices.findByStockGreaterThanEqual(stock));
-    // }
-
-
-    @PutMapping("/increase/product/{id}")
-    public ResponseEntity<?> increaseStock(@PathVariable Long id, @RequestParam int quantity) {
-        try {
-            productServices.increaseStock(id, quantity);
-            return ResponseEntity.ok("Stock increased by " + quantity + " for product with id: " + id);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -142,6 +93,19 @@ public class ProductController {
             }
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+            productServices.delete(id);
+            return ResponseEntity.ok("Product deleted");
+
+    }
+
+
+    @GetMapping("/find/name")
+    public ResponseEntity<?> getProductByName(@RequestParam String name) {
+            return ResponseEntity.ok(productServices.findByName(name));
+    }
+
     @PutMapping(value = "/update/{product_id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     public ResponseEntity<?> updateProduct(
         @Valid @ModelAttribute ProductRequestUpdateDto productDto,
@@ -186,10 +150,46 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
-            productServices.delete(id);
-            return ResponseEntity.ok("Product deleted");
-
+    @GetMapping("/find/id/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(productServices.findById(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
+
+    @GetMapping("/find/category")
+    public ResponseEntity<?> getProductsByCategory(@RequestParam String categoryName) {
+        try {
+            return ResponseEntity.ok(productServices.findByCategory(categoryName));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity<?> getProductByNameAndStock(
+        @RequestParam(required = false) String name, 
+        @RequestParam(required = false) Integer stock) {
+        return ResponseEntity.ok(productServices.findByNameContainingAndStock(name, stock));
+    }
+
+    // @GetMapping("/find/stock/{stock}")
+    // public ResponseEntity<?> getProductsByStock(@PathVariable int stock) {
+    //     return ResponseEntity.ok(productServices.findByStockGreaterThanEqual(stock));
+    // }
+
+        @PutMapping("/increase/product/{id}")
+    public ResponseEntity<?> increaseStock(@PathVariable Long id, @RequestParam int quantity) {
+        try {
+            productServices.increaseStock(id, quantity);
+            return ResponseEntity.ok("Stock increased by " + quantity + " for product with id: " + id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
 }

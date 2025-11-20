@@ -53,7 +53,7 @@ public class S3Services implements IS3Services{
     @Override
     public String checkIfBucketExist(String bucketName) {
         ListBucketsResponse listBucketsResponse = this.s3Client.listBuckets();
-        System.out.println("sdasdasdasdsa"+bucketName);
+        System.out.println("nombre bucket "+bucketName);
         boolean bucketExists = listBucketsResponse.buckets()
             .stream()
             .anyMatch(bucket -> bucket.name().equals(bucketName));
